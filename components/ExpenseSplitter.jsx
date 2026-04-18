@@ -5,7 +5,9 @@ import {
   Plus, Receipt, DollarSign, Sparkles, ArrowRight,
   Trash2, Check, Loader2, Users, MessageCircle,
   Search, Pencil, Download, X, Send, TrendingUp,
+  Moon, Sun, Image as ImageIcon,
 } from "lucide-react";
+import html2canvas from "html2canvas";
 import {
   calculateBalances, getSettlements, getCategorySpend,
   getMemberStats, getGroupStats, formatINR, uid,
@@ -41,12 +43,12 @@ function CategoryBadge({ category }) {
   );
 }
 
-function StatCard({ label, value, sub, color = "text-gray-800" }) {
+function StatCard({ label, value, sub, color = "text-gray-800 dark:text-gray-200" }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm">
-      <p className="text-xs text-gray-400 mb-1">{label}</p>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-3 shadow-sm">
+      <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{label}</p>
       <p className={`text-lg font-bold ${color} leading-tight`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -62,49 +64,49 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
   const customValid = form.amount && Math.abs(customSum - parseFloat(form.amount || 0)) < 0.01;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5 fade-in shadow-sm">
-      <h3 className="font-semibold text-gray-700 mb-4">{title}</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 mb-5 fade-in shadow-sm">
+      <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4">{title}</h3>
       <div className="grid grid-cols-2 gap-4">
 
         {/* Description */}
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</label>
           <div className="relative">
             <input
               autoFocus type="text" placeholder="e.g. Dinner at restaurant"
               value={form.description}
               onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
               onBlur={(e) => form.onDescBlur?.(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal-400 pr-9"
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-9"
             />
             {categorizing && <Loader2 className="absolute right-2.5 top-2.5 w-4 h-4 text-teal-500 animate-spin" />}
           </div>
           {form.category !== "other" && !categorizing && (
             <div className="mt-1.5 flex items-center gap-1.5">
               <CategoryBadge category={form.category} />
-              <span className="text-xs text-gray-400">AI detected</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">AI detected</span>
             </div>
           )}
         </div>
 
         {/* Amount */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Amount (₹)</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Amount (₹)</label>
           <input
             type="number" min="0" step="0.01" placeholder="0.00"
             value={form.amount}
             onChange={(e) => setForm((p) => ({ ...p, amount: e.target.value }))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal-400"
+            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
 
         {/* Paid by */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Paid by</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Paid by</label>
           <select
             value={form.paidBy}
             onChange={(e) => setForm((p) => ({ ...p, paidBy: e.target.value }))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal-400 bg-white"
+            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             {members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select>
@@ -112,7 +114,7 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
 
         {/* Category override */}
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-gray-500 mb-1">Category</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Category</label>
           <div className="flex flex-wrap gap-1.5">
             {Object.entries(CATEGORIES).map(([key, cat]) => (
               <button
@@ -121,7 +123,7 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
                   form.category === key
                     ? `${cat.bg} ${cat.text} ${cat.border}`
-                    : "bg-white text-gray-400 border-gray-200 hover:border-gray-300"
+                    : "bg-white dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                 }`}
               >
                 {cat.icon} {cat.label}
@@ -132,7 +134,7 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
 
         {/* Split type */}
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-gray-500 mb-2">Split type</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Split type</label>
           <div className="flex gap-2">
             {["equal", "custom"].map((t) => (
               <button
@@ -140,8 +142,8 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
                 onClick={() => setForm((p) => ({ ...p, splitType: t }))}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   form.splitType === t
-                    ? "bg-teal-100 text-teal-700 border-teal-200"
-                    : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"
+                    ? "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900 dark:text-teal-300 dark:border-teal-700"
+                    : "bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                 }`}
               >
                 {t === "equal" ? "Equal split" : "Custom split"}
@@ -153,7 +155,7 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
         {/* Equal — participants */}
         {form.splitType === "equal" && (
           <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-500 mb-2">Split among</label>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Split among</label>
             <div className="flex flex-wrap gap-2">
               {members.map((m) => {
                 const selected = form.participants.includes(m.id);
@@ -170,8 +172,8 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
                     }
                     className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                       selected
-                        ? "bg-teal-100 text-teal-700 border-teal-200"
-                        : "bg-white text-gray-400 border-gray-200 hover:border-gray-300"
+                        ? "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900 dark:text-teal-300 dark:border-teal-700"
+                        : "bg-white dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                     }`}
                   >
                     {selected && <Check className="w-3 h-3" />} {m.name}
@@ -179,32 +181,32 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
                 );
               })}
             </div>
-            {perPerson && <p className="text-xs text-gray-400 mt-2">₹{perPerson} per person</p>}
+            {perPerson && <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">₹{perPerson} per person</p>}
           </div>
         )}
 
         {/* Custom — per-person amounts */}
         {form.splitType === "custom" && (
           <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-500 mb-2">Custom amounts</label>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Custom amounts</label>
             <div className="space-y-2">
               {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-2">
                   <Avatar name={m.name} size="xs" />
-                  <span className="text-sm text-gray-600 w-20 flex-shrink-0">{m.name}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300 w-20 flex-shrink-0">{m.name}</span>
                   <input
                     type="number" min="0" step="0.01" placeholder="0.00"
                     value={form.customSplits[m.id] || ""}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, customSplits: { ...p.customSplits, [m.id]: e.target.value } }))
                     }
-                    className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1 text-sm outline-none focus:border-teal-400"
+                    className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-2.5 py-1 text-sm outline-none focus:border-teal-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               ))}
             </div>
             {form.amount && (
-              <p className={`text-xs mt-2 font-medium ${customValid ? "text-teal-600" : "text-orange-500"}`}>
+              <p className={`text-xs mt-2 font-medium ${customValid ? "text-teal-600 dark:text-teal-400" : "text-orange-500 dark:text-orange-400"}`}>
                 Total: ₹{customSum.toFixed(2)} / ₹{parseFloat(form.amount || 0).toFixed(2)} {customValid && "✓"}
               </p>
             )}
@@ -216,7 +218,7 @@ function ExpenseForm({ form, setForm, members, onSave, onCancel, categorizing, t
         <button onClick={onSave} className="flex-1 py-2.5 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors">
           {title === "Edit Expense" ? "Save Changes" : "Add Expense"}
         </button>
-        <button onClick={onCancel} className="flex-1 py-2.5 border border-gray-200 text-gray-500 text-sm rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+        <button onClick={onCancel} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Cancel</button>
       </div>
     </div>
   );
@@ -293,10 +295,26 @@ export default function ExpenseSplitter() {
   // Export feedback
   const [exported, setExported] = useState(false);
 
+  // Dark mode
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("darkMode") === "true";
+  });
+
   // Scroll chat to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
+
+  // Dark mode effect
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem("darkMode", darkMode.toString());
+  }, [darkMode]);
 
   // ── Derived data ──────────────────────────────────────────────────────────
 
@@ -484,6 +502,24 @@ export default function ExpenseSplitter() {
     });
   };
 
+  const exportAsImage = async () => {
+    const element = document.getElementById('export-summary');
+    if (!element) return;
+
+    try {
+      const canvas = await html2canvas(element, {
+        backgroundColor: darkMode ? '#1f2937' : '#ffffff',
+        scale: 2,
+      });
+      const link = document.createElement('a');
+      link.download = `${selectedGroup.name}-expense-summary.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    } catch (error) {
+      console.error('Error exporting image:', error);
+    }
+  };
+
   // ── AI actions ─────────────────────────────────────────────────────────────
 
   const resetAI = () => { setInsights(null); };
@@ -539,16 +575,16 @@ export default function ExpenseSplitter() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
 
       {/* ── Sidebar ── */}
-      <aside className="w-56 bg-white border-r border-gray-100 flex flex-col flex-shrink-0 shadow-sm">
-        <div className="p-4 border-b border-gray-100">
+      <aside className="w-full lg:w-56 bg-white dark:bg-gray-800 border-b lg:border-b-0 lg:border-r border-gray-100 dark:border-gray-700 flex flex-col flex-shrink-0 shadow-sm">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-700 lg:border-b-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm bg-teal-500">₹</div>
             <div>
-              <p className="text-sm font-semibold text-gray-800">SplitSmart</p>
-              <p className="text-xs text-gray-400">AI Expense Splitter</p>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">SplitSmart</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">AI Expense Splitter</p>
             </div>
           </div>
         </div>
@@ -591,11 +627,11 @@ export default function ExpenseSplitter() {
         <div className="flex-1 flex flex-col overflow-hidden">
 
           {/* Header */}
-          <header className="bg-white border-b border-gray-100 px-6 py-4 shadow-sm">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h1 className="text-lg font-semibold text-gray-800">{selectedGroup.name}</h1>
-                <div className="flex items-center gap-1.5 mt-2">
+          <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 lg:px-6 py-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+              <div className="flex-1">
+                <h1 className="text-lg font-semibold text-gray-800 dark:text-white">{selectedGroup.name}</h1>
+                <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                   {selectedGroup.members.map((m) => (
                     <div key={m.id} className="relative group/av">
                       <Avatar name={m.name} />
@@ -604,35 +640,47 @@ export default function ExpenseSplitter() {
                     </div>
                   ))}
                   <button onClick={() => setShowAddMember((v) => !v)}
-                    className="w-7 h-7 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-teal-400 hover:text-teal-500 transition-colors">
+                    className="w-7 h-7 rounded-full border-2 border-dashed border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:border-teal-400 hover:text-teal-500 transition-colors">
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
                 {showAddMember && (
-                  <div className="flex gap-2 mt-3 fade-in">
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3 fade-in">
                     <input autoFocus type="text" placeholder="Member name" value={newMemberName}
                       onChange={(e) => setNewMemberName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && addMember()}
-                      className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-teal-400 w-44" />
-                    <button onClick={addMember} className="px-3 py-1.5 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 font-medium">Add</button>
-                    <button onClick={() => setShowAddMember(false)} className="px-3 py-1.5 border border-gray-200 text-gray-500 text-sm rounded-lg">Cancel</button>
+                      className="text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 outline-none focus:border-teal-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full sm:w-44" />
+                    <div className="flex gap-2">
+                      <button onClick={addMember} className="px-3 py-1.5 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 font-medium">Add</button>
+                      <button onClick={() => setShowAddMember(false)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                    </div>
                   </div>
                 )}
               </div>
-              {/* Export button */}
-              <button onClick={exportSummary}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 text-gray-500 text-xs rounded-lg hover:bg-gray-50 transition-colors">
-                {exported ? <><Check className="w-3 h-3 text-teal-500" /> Copied!</> : <><Download className="w-3 h-3" /> Export</>}
-              </button>
+              {/* Export buttons and dark mode toggle */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <button onClick={() => setDarkMode(!darkMode)}
+                  className="p-2 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+                <button onClick={exportSummary}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-xs rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  {exported ? <><Check className="w-3 h-3 text-teal-500" /> Copied!</> : <><Download className="w-3 h-3" /> Copy</>}
+                </button>
+                <button onClick={exportAsImage}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-xs rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <ImageIcon className="w-3 h-3" /> Save Image
+                </button>
+              </div>
             </div>
 
             {/* Stats row */}
             {groupStats && allGroupExpenses.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 <StatCard label="Total spend" value={`₹${groupStats.totalSpend.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`} />
                 <StatCard label="Avg per person" value={`₹${groupStats.avgPerPerson.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`} />
                 <StatCard label="Top spender" value={groupStats.highestSpender?.name || "—"}
-                  sub={groupStats.highestSpender ? `₹${groupStats.highestSpender.amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })} paid` : ""} color="text-teal-600" />
+                  sub={groupStats.highestSpender ? `₹${groupStats.highestSpender.amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })} paid` : ""} color="text-teal-600 dark:text-teal-400" />
                 <StatCard label="Top category"
                   value={groupStats.topCategory ? (CATEGORIES[groupStats.topCategory.name]?.icon + " " + CATEGORIES[groupStats.topCategory.name]?.label) : "—"}
                   sub={groupStats.topCategory ? `₹${groupStats.topCategory.amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : ""} />
@@ -641,7 +689,7 @@ export default function ExpenseSplitter() {
           </header>
 
           {/* Tabs */}
-          <nav className="bg-white border-b border-gray-100 px-6 flex gap-5">
+          <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 lg:px-6 flex gap-3 lg:gap-5 overflow-x-auto">
             {[
               { id: "expenses", label: "Expenses", Icon: Receipt },
               { id: "balances", label: "Balances", Icon: DollarSign },
@@ -649,16 +697,16 @@ export default function ExpenseSplitter() {
               { id: "chat", label: "Ask AI", Icon: MessageCircle },
             ].map(({ id, label, Icon }) => (
               <button key={id} onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === id ? "border-teal-500 text-teal-600" : "border-transparent text-gray-500 hover:text-gray-700"
+                className={`flex items-center gap-1 lg:gap-1.5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === id ? "border-teal-500 text-teal-600 dark:text-teal-400" : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                 }`}>
-                <Icon className="w-3.5 h-3.5" /> {label}
+                <Icon className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{label}</span>
               </button>
             ))}
           </nav>
 
           {/* Tab content */}
-          <main className="flex-1 overflow-y-auto bg-gray-50">
+          <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
 
             {/* ══ EXPENSES TAB ══ */}
             {activeTab === "expenses" && (
@@ -1002,6 +1050,52 @@ export default function ExpenseSplitter() {
           <p className="text-sm">Select or create a group to get started.</p>
         </div>
       )}
+      
+      {/* Hidden export summary for image capture */}
+      <div id="export-summary" className="fixed -top-full -left-full p-6 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm max-w-md">
+        <div className="mb-4">
+          <h2 className="text-lg font-bold mb-2">💸 {selectedGroup?.name} — Expense Summary</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Generated: {new Date().toLocaleDateString("en-IN")}</p>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold mb-2">📊 Overview</h3>
+            <p>Total spend: ₹{totalSpend?.toLocaleString("en-IN")}</p>
+            <p>Members: {selectedGroup?.members.length}</p>
+            <p>Expenses: {allGroupExpenses?.length}</p>
+          </div>
+          
+          <div>
+            <h3 className="font-semibold mb-2">📋 Expenses</h3>
+            <div className="space-y-1">
+              {allGroupExpenses?.slice(0, 10).map((e, i) => (
+                <div key={i} className="text-xs">
+                  • {e.description} — ₹{e.amount} ({memberMap[e.paidBy]})
+                </div>
+              ))}
+              {allGroupExpenses?.length > 10 && <div className="text-xs text-gray-500">... and {allGroupExpenses.length - 10} more</div>}
+            </div>
+          </div>
+          
+          {allSettlements?.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-2">⚖ Settlements</h3>
+              <div className="space-y-1">
+                {allSettlements?.slice(0, 5).map((t, i) => (
+                  <div key={i} className="text-xs">
+                    • {t.from} → {t.to}: ₹{t.amount.toLocaleString("en-IN")}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-500 dark:text-gray-400">
+          Generated by Smart Expense Splitter
+        </div>
+      </div>
     </div>
   );
 }
